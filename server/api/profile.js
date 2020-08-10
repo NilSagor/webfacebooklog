@@ -108,24 +108,58 @@ router.get('/find/everyone', (req, res) => {
 
 // @type DELETE
 // @route /api/v1/profile/
-// @desc route for getting user profile based on username
+// @desc route for deleting user profile 
 // @access PRIVATE
 
 router.delete('/',
-  passport.authenticate('jwt', {session: false},
+  passport.authenticate('jwt', {session: false}),
   (req, res) => {
     Profile.findOne({ user: req.user.id })
     Profile.findOneAndRemove({ user: req.user.id })
       .then(() => {
         Person.findOneAndRemove({_id:req.user.id})
+        .then(() => res.json({ success: "delete was successful" }))
+        .catch(err => console.log(err))
       })
-      .then(() => {
-        
-      })
-  })
+      .catch(err => console.log(err)) 
 
+})
 
+// @type POST
+// @route /api/v1/profile/mywork
+// @desc route for adding work profile of a person
+// @access PRIVATE
+
+router.post('/mywork', 
+  passport.authenticate('jwt', {session: false}),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+    .then(profile => {
+      const newWork = {
+        role: req.body.role,
+        country: req.body.country,
+        country: req.body.country,
+        company: req.body.company,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        details: req.body.details
+      }
+      profile.workrole.push(newWork)
+      Prorile
+        .save()
+        .then(profile => res.json(profile))
+        .catch(err => console.log(err))
+    })
+  }
 )
+
+// @type POST
+// @route /api/v1/profile/mywork
+// @desc route for adding work profile of a person
+// @access PRIVATE
+
+
 
 
   module.exports = router 
